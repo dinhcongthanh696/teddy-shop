@@ -1,0 +1,108 @@
+/* Reset cơ bản */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: #f9f9f9;
+}
+
+/* Footer chính */
+.footer {
+  background-color: #feb5c0; /* Màu hồng nhạt */
+  color: #fff;
+  padding: 20px 0;
+  text-align: center;
+}
+
+/* Khối dịch vụ (trên cùng) */
+.footer__top {
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.footer__services {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.service-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 120px; /* tuỳ chỉnh */
+}
+
+.service-item img {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 10px;
+}
+
+/* Khối thông tin (giữa) */
+.footer__middle {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+.footer__info-block {
+  flex: 1 1 200px; /* Giới hạn nhỏ nhất là 200px */
+  min-width: 200px;
+  text-align: left;
+}
+
+.footer__title {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.footer__list {
+  list-style: none;
+  line-height: 1.6;
+}
+
+.footer__list li {
+  margin-bottom: 5px;
+}
+
+/* Liên kết */
+.footer__info-block a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.footer__info-block a:hover {
+  color: #ffe3e7;
+}
+
+/* Fanpage / Social */
+.footer__social {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.social-icon img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Khối bản quyền (dưới cùng) */
+.footer__bottom {
+  border-top: 1px solid rgba(255,255,255,0.3);
+  padding-top: 10px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
