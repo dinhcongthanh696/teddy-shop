@@ -1,0 +1,61 @@
+/* Custom navbar background */
+.bg-custom {
+    background-color: #9b6a7c;
+}
+
+/* Logo */
+.logo {
+    width: 40px;
+    height: auto;
+}
+
+/* Search box */
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 15px;
+}
+
+.search-box input {
+    width: 200px;
+}
+
+/* User avatar */
+.user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+/* Product image in table */
+.product-img {
+    width: 50px;
+    height: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .search-box input {
+        width: 150px;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+    }
+
+    .product-img {
+        width: 40px;
+    }
+
+    /* Adjust navbar alignment for mobile */
+    .navbar-nav {
+        text-align: center;
+        width: 100%;
+    }
+
+    .navbar-nav .nav-item {
+        width: 100%;
+    }
+}

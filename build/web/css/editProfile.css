@@ -1,0 +1,114 @@
+/* Thiết lập cơ bản */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+    margin-top: 12%;
+}
+
+
+
+/* Container form chính */
+.edit-profile-container {
+    max-width: 600px;
+    width: 100%;
+    margin: 40px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #666;
+}
+
+.form-group input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Khu vực nút bấm */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.cancel-btn,
+.save-btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 4px;
+}
+
+.cancel-btn {
+    background-color: #ccc;
+    color: #333;
+    transition: background-color 0.3s;
+}
+
+.cancel-btn:hover {
+    background-color: #b3b3b3;
+}
+
+.save-btn {
+    background-color: #e91e63;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+.save-btn:hover {
+    background-color: #c2185b;
+}
+
+.change-image-btn{
+    margin-right: auto;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 4px;
+}
+
+.change-image-btn {
+    background-color: #e91e63;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+.change-image-btn:hover {
+    background-color: #c2185b;
+}
+
+footer {
+    margin-top: 10%;
+}

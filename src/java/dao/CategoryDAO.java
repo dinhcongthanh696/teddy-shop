@@ -20,8 +20,6 @@ public class CategoryDAO extends DBConnection {
 
     public CategoryDAO() {
     }
-    
-   
 
     //Get all category
     public ArrayList<Category> getAllCategory() throws Exception {
@@ -31,7 +29,7 @@ public class CategoryDAO extends DBConnection {
         PreparedStatement pre = null;
         /* Prepared statement for executing sql queries */
         ArrayList<Category> categoryList = new ArrayList<>();
-        String sql = "SELECT * FROM Category";
+        String sql = "SELECT * FROM Category where [status] = 1 or [status] is null";
         try {
             conn = getConnection();
             pre = conn.prepareStatement(sql);
@@ -39,10 +37,11 @@ public class CategoryDAO extends DBConnection {
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
-                categoryList.add(new Category(id, name));
+                Boolean status = rs.getBoolean("status");
+                categoryList.add(new Category(id, name, status));
             }
             return categoryList;
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             throw ex;
         } finally {
             closeResultSet(rs);
@@ -53,9 +52,11 @@ public class CategoryDAO extends DBConnection {
 
     //Get a category with id
     public Category getById(int id) {
-        String sql = "SELECT * FROM Category WHERE id = ?";
+
+        Connection conn = getConnection();
+        String sql = "SELECT * FROM Category WHERE ([status] = 1 or [status] is null) and id = ?";
         try {
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = conn.prepareStatement(sql);
             statement.setInt(1, id);
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
@@ -71,10 +72,9 @@ public class CategoryDAO extends DBConnection {
         return null;
     }
 
-    
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT * FROM Category";
+        String sql = "SELECT * FROM Category where [status] = 1 or [status] is null";
         try {
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();
@@ -88,5 +88,46 @@ public class CategoryDAO extends DBConnection {
             System.out.println("Error retrieving categories: " + ex);
         }
         return categories;
+    }
+
+    // Add these methods to your existing CategoryDAO class
+    public void addCategory(Category category) {
+        Connection conn = getConnection();
+
+        String sql = "INSERT INTO Category ([name], [status]) VALUES (?, 1)";
+        try {
+            PreparedStatement st = conn.prepareStatement(sql);
+            st.setString(1, category.getName());
+            st.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error adding category: " + e.getMessage());
+        }
+    }
+
+    public void updateCategory(Category category) {
+        Connection conn = getConnection();
+
+        String sql = "UPDATE Category SET [name] = ? WHERE id = ?";
+        try {
+            PreparedStatement st = conn.prepareStatement(sql);
+            st.setString(1, category.getName());
+            st.setInt(2, category.getId());
+            st.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error updating category: " + e.getMessage());
+        }
+    }
+
+    public void toggleCategoryStatus(int id) {
+        Connection conn = getConnection();
+
+        String sql = "UPDATE Category SET [status] = 0 WHERE id = ?";
+        try {
+            PreparedStatement st = conn.prepareStatement(sql);
+            st.setInt(1, id);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error toggling category status: " + e.getMessage());
+        }
     }
 }

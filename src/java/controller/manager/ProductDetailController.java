@@ -30,7 +30,7 @@ public class ProductDetailController extends HttpServlet {
             Product product = productDAO.getById(productId);
             if (product != null) {
                 request.setAttribute("product", product);
-                request.getRequestDispatcher("product-detail.jsp").forward(request, response);
+                request.getRequestDispatcher("/manager/product-detail.jsp").forward(request, response);
                 return;
             }
         }

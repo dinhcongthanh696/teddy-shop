@@ -55,7 +55,7 @@ public class ProductDAO extends DBConnection {
             return images;
         } catch (Exception ex) {
             throw ex;
-        } 
+        }
     }
 
     public ArrayList<Size> getProductSizes(int productId) throws Exception {
@@ -83,7 +83,7 @@ public class ProductDAO extends DBConnection {
             return sizes;
         } catch (Exception ex) {
             throw ex;
-        } 
+        }
     }
 
     public ArrayList<Product> getAllProduct() throws Exception {
@@ -93,7 +93,7 @@ public class ProductDAO extends DBConnection {
         PreparedStatement pre = null;
         /* Prepared statement for executing sql queries */
         ArrayList<Product> productList = new ArrayList<>();
-        String sql = "SELECT * FROM Product";
+        String sql = "SELECT * FROM Product WHERE [status] = 1 or [status] is null";
         try {
             conn = getConnection();
             pre = conn.prepareStatement(sql);
@@ -122,7 +122,7 @@ public class ProductDAO extends DBConnection {
         PreparedStatement pre = null;
         /* Prepared statement for executing sql queries */
         ArrayList<Product> productList = new ArrayList<>();
-        String sql = "SELECT * FROM Product where categoryId = " + categoryID;
+        String sql = "SELECT * FROM Product where ([status] = 1 or [status] is null) and categoryId = " + categoryID;
         try {
             conn = getConnection();
             pre = conn.prepareStatement(sql);
@@ -155,7 +155,7 @@ public class ProductDAO extends DBConnection {
         PreparedStatement pre = null;
         /* Prepared statement for executing sql queries */
         ArrayList<Product> productList = new ArrayList<>();
-        String sql = "SELECT * FROM Product where typeId = " + typeID;
+        String sql = "SELECT * FROM Product where ([status] = 1 or [status] is null) and typeId = " + typeID;
         try {
             conn = getConnection();
             pre = conn.prepareStatement(sql);
@@ -188,7 +188,7 @@ public class ProductDAO extends DBConnection {
         PreparedStatement pre = null;
         /* Prepared statement for executing sql queries */
         ArrayList<Product> productList = new ArrayList<>();
-        String sql = "select p.*from Product p "
+        String sql = "select p.*from Product p  "
                 + "inner join Category c on p.categoryId = c.id "
                 + "inner join ProductType pt on pt.id = p.typeId "
                 + "where p.name COLLATE Latin1_General_CI_AI like '%" + text + "%' "
@@ -223,7 +223,7 @@ public class ProductDAO extends DBConnection {
     public List<Product> getProductsWithParam(String searchParam, Integer categoryId, Integer typeId, Integer minPrice, Integer maxPrice) {
         List<Product> products = new ArrayList<>();
         List<Object> params = new ArrayList<>();
-        StringBuilder query = new StringBuilder("SELECT * FROM Product p WHERE 1=1 ");
+        StringBuilder query = new StringBuilder("SELECT * FROM Product p WHERE ([status] = 1 or [status] is null) and 1=1 ");
 
         if (searchParam != null && !searchParam.trim().isEmpty()) {
             query.append("AND p.name LIKE ? ");
@@ -322,7 +322,7 @@ public class ProductDAO extends DBConnection {
     }
 
     public Product getById(int id) {
-        String sql = "SELECT * FROM Product WHERE id = ?";
+        String sql = "SELECT * FROM Product WHERE ([status] = 1 or [status] is null) and id = ?";
         PreparedStatement statement = null;
         ResultSet rs = null;
         try {
@@ -381,4 +381,138 @@ public class ProductDAO extends DBConnection {
         return products.subList(fromIndex, toIndex);
     }
 
+    public void updateProduct(Product product) {
+        String sql = "UPDATE Product SET name=?, categoryId=?, typeId=? WHERE id=?";
+        PreparedStatement statement = null;
+        try {
+            // Update main product information
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, product.getName());
+            statement.setInt(2, product.getCategory().getId());
+            statement.setInt(3, product.getProductType().getId());
+            statement.setInt(4, product.getId());
+            statement.executeUpdate();
+
+            // Update product images
+            // First delete existing images
+            String deleteImagesSQL = "DELETE FROM ProductImage WHERE productId=?";
+            PreparedStatement deleteImgStmt = connection.prepareStatement(deleteImagesSQL);
+            deleteImgStmt.setInt(1, product.getId());
+            deleteImgStmt.executeUpdate();
+
+            // Insert new images
+            if (product.getImages() != null && !product.getImages().isEmpty()) {
+                String sqlImage = "INSERT INTO ProductImage (productId, source) VALUES (?, ?)";
+                PreparedStatement imgStmt = connection.prepareStatement(sqlImage);
+                for (ProductImage img : product.getImages()) {
+                    imgStmt.setInt(1, product.getId());
+                    imgStmt.setString(2, img.getSource());
+                    imgStmt.addBatch();
+                }
+                imgStmt.executeBatch();
+                imgStmt.close();
+            }
+
+            // Update sizes
+            // First delete existing sizes
+            String deleteSizesSQL = "DELETE FROM Size WHERE productId=?";
+            PreparedStatement deleteSizeStmt = connection.prepareStatement(deleteSizesSQL);
+            deleteSizeStmt.setInt(1, product.getId());
+            deleteSizeStmt.executeUpdate();
+
+            // Insert updated sizes
+            if (product.getSizes() != null && !product.getSizes().isEmpty()) {
+                String sqlSize = "INSERT INTO Size (productId, name, quantity, price) VALUES (?, ?, ?, ?)";
+                PreparedStatement sizeStmt = connection.prepareStatement(sqlSize);
+                for (Size s : product.getSizes()) {
+                    sizeStmt.setInt(1, product.getId());
+                    sizeStmt.setString(2, s.getName());
+                    sizeStmt.setInt(3, s.getQuantity());
+                    sizeStmt.setInt(4, Integer.parseInt(s.getPrice().replace(".", "")));
+                    sizeStmt.addBatch();
+                }
+                sizeStmt.executeBatch();
+                sizeStmt.close();
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Error updating product: " + ex);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ex) {
+                    System.out.println("Error closing statement: " + ex);
+                }
+            }
+        }
+    }
+public void setProductStatus(int productId, boolean status) {
+    try {
+        String sql = "UPDATE Product SET status = ? WHERE id = ?";
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setBoolean(1, status);
+        st.setInt(2, productId);
+        st.executeUpdate();
+    } catch (SQLException e) {
+        System.out.println("Error setting product status: " + e.getMessage());
+    }
 }
+
+public ArrayList<Product> getFilteredProducts(Integer categoryId, String sizeId, Double minPrice, Double maxPrice) {
+    ArrayList<Product> filteredProducts = new ArrayList<>();
+    StringBuilder sql = new StringBuilder("SELECT DISTINCT p.* FROM Product p ");
+            Connection conn = getConnection();
+
+    if (sizeId != null || minPrice != null || maxPrice != null) {
+        sql.append("JOIN ProductSize ps ON p.id = ps.product_id ");
+    }
+    
+    sql.append("WHERE 1=1 ");
+    
+    if (categoryId != null) {
+        sql.append("AND p.category_id = ? ");
+    }
+    if (sizeId != null) {
+        sql.append("AND ps.name = ? ");
+    }
+    if (minPrice != null) {
+        sql.append("AND ps.price >= ? ");
+    }
+    if (maxPrice != null) {
+        sql.append("AND ps.price <= ? ");
+    }
+    
+    try {
+        PreparedStatement st = conn.prepareStatement(sql.toString());
+        int paramIndex = 1;
+        
+        if (categoryId != null) {
+            st.setInt(paramIndex++, categoryId);
+        }
+        if (sizeId != null) {
+            st.setString(paramIndex++, sizeId);
+        }
+        if (minPrice != null) {
+            st.setDouble(paramIndex++, minPrice);
+        }
+        if (maxPrice != null) {
+            st.setDouble(paramIndex++, maxPrice);
+        }
+        
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            Product product = new Product();
+            // ... your existing product mapping code ...
+            filteredProducts.add(product);
+        }
+    } catch (SQLException e) {
+        System.out.println("Error getting filtered products: " + e.getMessage());
+    }
+    return filteredProducts;
+}
+
+}
+
+
+

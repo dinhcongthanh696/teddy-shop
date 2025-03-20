@@ -1,0 +1,26 @@
+body {
+    background-color: #e1bee7;
+}
+
+.register-box {
+    background-color: #ffffff;
+}
+
+.register-img {
+    max-width: 150%;
+    height: auto;
+}
+
+.mb-4 {
+    color: #d500f9;
+}
+
+.btn-primary {
+    background-color: #8e24aa;
+    border-color: #8e24aa;
+}
+
+.btn-primary:hover {
+    background-color: #6a1b9a;
+    border-color: #6a1b9a;
+}

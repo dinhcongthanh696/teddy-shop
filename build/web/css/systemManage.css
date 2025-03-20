@@ -1,0 +1,23 @@
+.wrap{
+    min-height: 55vh;
+    margin-top: 15%;
+    margin-left: 15%;
+    margin-right: 15%;
+    margin-bottom: 6%;
+}
+
+.big-button{
+    height: 10vh;
+    width: 20vw;
+    background-color: #dc81e8;
+    border: 2px solid;
+    border-radius: 5px;
+    margin: 3vh 3vw;
+    display: inline-block;
+    padding: 20px;
+    padding-bottom: 46px;
+}
+
+.big-button:hover{
+    background-color: #99ccff;
+}

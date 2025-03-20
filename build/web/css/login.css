@@ -1,0 +1,25 @@
+body {
+    background-color: #f3e5f5;
+}
+
+.login-box {
+    background-color: #ffffff;
+}
+
+.teddy-img {
+    max-width: 486px;
+    height: auto;
+}
+.mb-4{
+    color: #ff0ab5;
+}
+
+.btn-primary {
+    background-color: #9c27b0;
+    border-color: #9c27b0;
+}
+
+.btn-primary:hover {
+    background-color: #7b1fa2;
+    border-color: #7b1fa2;
+}
