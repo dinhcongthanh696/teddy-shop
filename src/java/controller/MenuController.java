@@ -75,7 +75,9 @@ public class MenuController extends HttpServlet {
                 String categoryName = request.getParameter("name");
                 String filterActive = request.getParameter("filterActive");
 
-                if (categoryName == null && filterActive == null) {
+                if(categoryName == null) categoryName = "";
+                
+                if ("".equals(categoryName) && filterActive == null) {
                     ArrayList<Product> productList = productDAO.getAllProduct();
                     request.setAttribute("categoryName", "Tất cả sản phẩm");
 
@@ -111,7 +113,6 @@ public class MenuController extends HttpServlet {
                 } else {
                     // In your processRequest method:
                     request.setAttribute("categoryName", "Kết quả tìm kiếm");
-                    System.out.println("Kết quả tìm kiếm");
 
                     // Get all active categories
                     List<Category> categories = categoryDAO.getAllCategories();
@@ -119,7 +120,7 @@ public class MenuController extends HttpServlet {
 
                     // Get all sizes
                     ArrayList<Size> sizes = new ArrayList<>();
-                    sizeDAO.getAllSizes();
+                   sizes = sizeDAO.getAllSizes();
                     request.setAttribute("sizes", sizes);
 
                     // Get filtered products
@@ -127,7 +128,7 @@ public class MenuController extends HttpServlet {
 
                     ArrayList<Product> productList = new ArrayList<>();
 
-                    if (categoryId == null) {
+                    if (categoryId == null || categoryId == "") {
                         productDAO.getAllProduct();
                     } else {
                         productDAO.getProductByCategory(Integer.parseInt(categoryId));
@@ -144,14 +145,13 @@ public class MenuController extends HttpServlet {
                         productList = productDAO.getFilteredProducts(
                                 categoryId != null && !categoryId.isEmpty() ? Integer.valueOf(categoryId) : null,
                                 sizeId != null && !sizeId.isEmpty() ? sizeId : null,
-                                minPrice != null && !minPrice.isEmpty() ? Double.valueOf(minPrice) : null,
-                                maxPrice != null && !maxPrice.isEmpty() ? Double.valueOf(maxPrice) : null
+                                minPrice != null && !minPrice.isEmpty() ? Integer.valueOf(minPrice) : null,
+                                maxPrice != null && !maxPrice.isEmpty() ? Integer.valueOf(maxPrice) : null
                         );
                     } else {
                         productList = productDAO.getAllProduct();
                     }
                     request.setAttribute("productList", productList);
-                    request.setAttribute("categoryName", categoryName);
                     request.getRequestDispatcher("jsp/allProduct.jsp").forward(request, response);
                 }
             }

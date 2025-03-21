@@ -447,72 +447,80 @@ public class ProductDAO extends DBConnection {
             }
         }
     }
-public void setProductStatus(int productId, boolean status) {
-    try {
-        String sql = "UPDATE Product SET status = ? WHERE id = ?";
-        PreparedStatement st = connection.prepareStatement(sql);
-        st.setBoolean(1, status);
-        st.setInt(2, productId);
-        st.executeUpdate();
-    } catch (SQLException e) {
-        System.out.println("Error setting product status: " + e.getMessage());
-    }
-}
 
-public ArrayList<Product> getFilteredProducts(Integer categoryId, String sizeId, Double minPrice, Double maxPrice) {
-    ArrayList<Product> filteredProducts = new ArrayList<>();
-    StringBuilder sql = new StringBuilder("SELECT DISTINCT p.* FROM Product p ");
-            Connection conn = getConnection();
+    public void setProductStatus(int productId, boolean status) {
+        try {
+            String sql = "UPDATE Product SET status = ? WHERE id = ?";
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setBoolean(1, status);
+            st.setInt(2, productId);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error setting product status: " + e.getMessage());
+        }
+    }
 
-    if (sizeId != null || minPrice != null || maxPrice != null) {
-        sql.append("JOIN ProductSize ps ON p.id = ps.product_id ");
-    }
-    
-    sql.append("WHERE 1=1 ");
-    
-    if (categoryId != null) {
-        sql.append("AND p.category_id = ? ");
-    }
-    if (sizeId != null) {
-        sql.append("AND ps.name = ? ");
-    }
-    if (minPrice != null) {
-        sql.append("AND ps.price >= ? ");
-    }
-    if (maxPrice != null) {
-        sql.append("AND ps.price <= ? ");
-    }
-    
-    try {
-        PreparedStatement st = conn.prepareStatement(sql.toString());
-        int paramIndex = 1;
-        
+    public ArrayList<Product> getFilteredProducts(Integer categoryId, String sizeId, Integer minPrice, Integer maxPrice) throws Exception {
+        ArrayList<Product> filteredProducts = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT DISTINCT p.* FROM Product p ");
+        Connection conn = getConnection();
+
+
+        if (sizeId != null || minPrice != null || maxPrice != null) {
+            sql.append("JOIN Size ps ON p.id = ps.productId ");
+        }
+
+        sql.append("WHERE 1=1 ");
+        sql.append(" AND (p.[status] = 1 or p.[status] is null) ");
+
         if (categoryId != null) {
-            st.setInt(paramIndex++, categoryId);
+            sql.append("AND p.categoryId = ? ");
         }
         if (sizeId != null) {
-            st.setString(paramIndex++, sizeId);
+            sql.append("AND ps.name = ? ");
         }
         if (minPrice != null) {
-            st.setDouble(paramIndex++, minPrice);
+            sql.append("AND ps.price >= ? ");
         }
         if (maxPrice != null) {
-            st.setDouble(paramIndex++, maxPrice);
+            sql.append("AND ps.price <= ? ");
         }
-        
-        ResultSet rs = st.executeQuery();
-        while (rs.next()) {
-            Product product = new Product();
-            // ... your existing product mapping code ...
-            filteredProducts.add(product);
+
+
+        try {
+            PreparedStatement st = conn.prepareStatement(sql.toString());
+            int paramIndex = 1;
+
+            if (categoryId != null) {
+                st.setInt(paramIndex++, categoryId);
+            }
+            if (sizeId != null) {
+                st.setString(paramIndex++, sizeId);
+            }
+            if (minPrice != null) {
+                st.setInt(paramIndex++, minPrice);
+            }
+            if (maxPrice != null) {
+                st.setInt(paramIndex++, maxPrice);
+            }
+
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                int productId = rs.getInt("id");
+                String name = rs.getString("name");
+                ArrayList<ProductImage> images = getProductImages(productId);
+                ArrayList<Size> sizes = getProductSizes(productId);
+                int catId = rs.getInt("categoryId");
+                int tId = rs.getInt("typeId");
+                ProductType productType = productTypeDAO.getById(tId);
+                Category category = categoryDAO.getById(catId);
+                Product product = new Product(productId, name, images, sizes, productType, category);
+                filteredProducts.add(product);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting filtered products: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        System.out.println("Error getting filtered products: " + e.getMessage());
+        return filteredProducts;
     }
-    return filteredProducts;
-}
 
 }
-
-
-

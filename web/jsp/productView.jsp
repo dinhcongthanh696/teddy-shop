@@ -7,103 +7,111 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Gấu Bông Teddy Socola</title>
-        <!-- Kết nối đến file CSS -->
+        <title>${product.name}</title>
         <link rel="stylesheet" href="${contextPath}/css/productView.css">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+        <!-- Link file CSS riêng -->
+        <link rel="stylesheet" href="../css/cart.css">
+        
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     </head>
     <body>
         <jsp:include page="header.jsp" />
         <div style="margin-top: 150px;">
+            <h1 class="product-title " style=" width: 100%; text-align: center;">Thông tin sản phẩm</h1>
             <div class="product-container">
-                <!-- Hình ảnh sản phẩm (bên trái) -->
                 <div class="product-image">
-                    <!-- Thay link ảnh của bạn vào src bên dưới -->
-                    <img src="https://gaubongonline.vn/wp-content/uploads/2024/05/Chuot-capybara-than-tai-2.jpg" alt="Gấu Bông Teddy Socola">
-
+                    <img src="${contextPath}/${product.images[0].source}" alt="${product.name}" id="mainImage">
                 </div>
 
-                <!-- Thông tin sản phẩm (bên phải) -->
                 <div class="product-details">
-                    <h1 class="product-title">Gấu Bông Teddy Socola</h1>
+                    <h2 class="product-title">${product.name}</h2>
 
                     <table class="size-status-table">
                         <thead>
                             <tr>
-                                <th>Kích thước</th>
-                                <th>Giá bán</th>
+                                <th>Kích cỡ</th>
+                                <th>Giá</th>
                                 <th>Trạng thái</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>80cm</td>
-                                <td>425.000đ</td>
-                                <td>Còn hàng</td>
-                            </tr>
-                            <tr>
-                                <td>1m</td>
-                                <td>550.000đ</td>
-                                <td>Còn hàng</td>
-                            </tr>
-                            <tr>
-                                <td>1m2</td>
-                                <td>650.000đ</td>
-                                <td>Còn hàng</td>
-                            </tr>
+                            <c:forEach items="${product.sizes}" var="size">
+                                <tr>
+                                    <td>${size.name}</td>
+                                    <td>${size.price}₫</td>
+                                    <td>${size.quantity > 0 ? 'Còn hàng' : 'Hết hàng'}</td>
+                                </tr>
+                            </c:forEach>
                         </tbody>
                     </table>
 
-                    <div class="product-price">425.000đ </div>
+                    <div class="product-price">${product.sizes[0].price}₫</div>
 
                     <div class="product-actions">
-                        <button id="buyButton" class="btn btn-buy">Thêm vào giỏ hàng</button>
-                        <button id="buyButton2" class="btn btn-quick-order">Mua ngay</button>
+                        <button id="buyButton" class="btn btn-primary">Thêm vào giỏ hàng</button>
+                        <button id="buyButton2" class="btn btn-secondary">Mua ngay</button>
                     </div>
-
 
                     <p class="note">
                         HÀ NỘI: 8:30 - 23:00 <br>
                         275 Bạch Mai, Hai Bà Trưng, Hà Nội - 0979896616
                     </p>
                 </div>
-                <!-- Pop-up chọn size -->
+
+                <!-- Add to Cart Popup -->
                 <div id="sizePopup" class="popup">
                     <div class="popup-content">
                         <span class="close" id="closePopup">&times;</span>
-                        <h2>Chọn kích cỡ sản phẩm</h2>
-                        <select id="productSize">
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                        </select>
-                        <button id="addToCart">Thêm vào giỏ hàng</button>
+                        <h2>Chọn kích cỡ</h2>
+                        <form action="${contextPath}/add-to-cart" method="POST">
+                            <input type="hidden" name="productId" value="${product.id}">
+                            <select class="form-select form-control" id="productSize" name="sizeId" required>
+                                <c:forEach items="${product.sizes}" var="size">
+                                    <option value="${size.id}" data-price="${size.price}">
+                                        ${size.name} - ${size.price}₫
+                                    </option>
+                                </c:forEach>
+                            </select>
+                            <br/>
+                            <button type="submit" class="btn btn-primary w-100">Thêm vào giỏ hàng</button>
+                        </form>
                     </div>
                 </div>
+
+                <!-- Buy Now Popup -->
                 <div id="sizePopup2" class="popup">
                     <div class="popup-content">
-                        <span class="close" id="closePopup">&times;</span>
-                        <h2>Chọn kích cỡ sản phẩm</h2>
-                        <select id="productSize">
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                        </select>
-                        <button id="addToCart">Mua Ngay</button>
+                        <span class="close" id="closePopup2">&times;</span>
+                        <h2>Select Size</h2>
+                        <form action="${contextPath}/buy-now" method="POST">
+                            <input type="hidden" name="productId" value="${product.id}">
+                            <select id="productSize2" name="sizeId" required>
+                                <c:forEach items="${product.sizes}" var="size">
+                                    <option value="${size.id}" data-price="${size.price}">
+                                        ${size.name} - ${size.price}₫
+                                    </option>
+                                </c:forEach>
+                            </select>
+                            <button type="submit" class="btn btn-primary">Mua ngay</button>
+                        </form>
                     </div>
                 </div>
-                
             </div>
+
+            <!-- Product Images Gallery -->
             <div class="small-images">
                 <ul>
-                    <li>
-                        <img src="https://gaubongonline.vn/wp-content/uploads/2024/05/Chuot-capybara-than-tai-2.jpg" alt="Gấu Bông Teddy Socola">
-                    </li>
-                    <li>
-                        <img src="https://gaubongonline.vn/wp-content/uploads/2024/05/Chuot-capybara-than-tai-2.jpg" alt="Gấu Bông Teddy Socola">
-                    </li>
-
+                    <c:forEach items="${product.images}" var="image">
+                        <li>
+                            <img src="${contextPath}/${image.source}" 
+                                 alt="${product.name}" 
+                                 onclick="updateMainImage('${contextPath}/${image.source}')">
+                        </li>
+                    </c:forEach>
                 </ul>
             </div>
         </div>
@@ -111,39 +119,47 @@
         <footer style="margin-top: 151px;">
             <jsp:include page="footer.jsp" />
         </footer>
-    </body>
-    <script>
-// Lấy các phần tử
-        var buyButton = document.getElementById("buyButton");
-        var buyButton2 = document.getElementById("buyButton2");
-        var sizePopup = document.getElementById("sizePopup");
-        var sizePopup2 = document.getElementById("sizePopup2");
-        var closePopup = document.getElementById("closePopup");
-        var addToCart = document.getElementById("addToCart");
 
-// Khi bấm vào nút Mua hàng, hiển thị pop-up
-        buyButton.onclick = function () {
-            sizePopup.style.display = "block";
-        }
-
-        buyButton2.onclick = function () {
-            sizePopup2.style.display = "block";
-        }
-
-// Khi bấm vào nút đóng pop-up
-        closePopup.onclick = function () {
-            sizePopup.style.display = "none";
-            sizePopup2.style.display = "none";
-        }
-
-// Khi bấm ra ngoài pop-up, đóng pop-up
-        window.onclick = function (event) {
-            if (event.target == sizePopup) {
-                sizePopup.style.display = "none";
-            } else if (event.target == sizePopup2) {
-                sizePopup2.style.display = "none";
+        <script>
+            // Image Gallery
+            function updateMainImage(src) {
+                document.getElementById('mainImage').src = src;
             }
-        }
 
-    </script>
+            // Popup Handling
+            const buyButton = document.getElementById("buyButton");
+            const buyButton2 = document.getElementById("buyButton2");
+            const sizePopup = document.getElementById("sizePopup");
+            const sizePopup2 = document.getElementById("sizePopup2");
+            const closePopup = document.getElementById("closePopup");
+            const closePopup2 = document.getElementById("closePopup2");
+
+            buyButton.onclick = () => sizePopup.style.display = "block";
+            buyButton2.onclick = () => sizePopup2.style.display = "block";
+            closePopup.onclick = () => sizePopup.style.display = "none";
+            closePopup2.onclick = () => sizePopup2.style.display = "none";
+
+            window.onclick = (event) => {
+                if (event.target === sizePopup) {
+                    sizePopup.style.display = "none";
+                }
+                if (event.target === sizePopup2) {
+                    sizePopup2.style.display = "none";
+                }
+            };
+
+            // Update price when size changes
+            document.getElementById('productSize').onchange = function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const price = selectedOption.getAttribute('data-price');
+                document.querySelector('.product-price').textContent = price + '₫';
+            };
+
+            document.getElementById('productSize2').onchange = function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const price = selectedOption.getAttribute('data-price');
+                document.querySelector('.product-price').textContent = price + '₫';
+            };
+        </script>
+    </body>
 </html>
